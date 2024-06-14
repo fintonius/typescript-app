@@ -1,4 +1,5 @@
 let index = 0;
+let tasks = [];
 
 // 'Task' is a type alias. It is like a variable in JS and lets you define a
 // type that can be reused throughout your code. Types can also be imported
@@ -19,15 +20,15 @@ type Task = {
     createdAt: Date;
 }
 
-let tasks: Array = [];
-
 function create(content: string): Task {
-    return {
+    let task: Task = {
         content,
-        id: i++,
+        id: index++,
         status: 'incomplete',
         createdAt: new Date(),
     };
+    tasks.push(task);
+    return task;
 }
 
 function complete(task: Task) {   

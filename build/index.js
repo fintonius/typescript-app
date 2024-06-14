@@ -3,12 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 let index = 0;
 let tasks = [];
 function create(content) {
-    return {
+    let task = {
         content,
-        id: i++,
+        id: index++,
         status: 'incomplete',
         createdAt: new Date(),
     };
+    tasks.push(task);
+    return task;
 }
 function complete(task) {
     task.status = 'complete';
