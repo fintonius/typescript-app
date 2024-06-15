@@ -1,3 +1,7 @@
+// COMMANDS TO RUN IN TERMINALS TO WATCH CODE:
+// node --watch build/index.js 
+// npx tsc -w
+import { styleText } from "node:util";
 let index = 0;
 
 // This is telling TS that this array will be expected to only be filled
@@ -10,7 +14,7 @@ let index = 0;
 // function takes. You can use other JS types, 'string', 'number', 'object',
 // etc., in generics but as it's TS being as specific as possible is 
 // always best!
-let tasks: Array<Task> = [];
+let tasks: Array<Task | Birthday> = [];
 // IMPORTANT NOTE: Arrays in TS cannot change the type of items it can take
 // once it's defined - you could not pass a 'number' type into an array 
 // declared as 'Array<String>' for example.
@@ -32,11 +36,24 @@ type Task = {
     // The '|' is called a 'union operator'. It allows TS to check between the 
     // different values 
     status: 'incomplete' | 'complete';
+    // when dealing with multiple types it's good to give it a 'kind' property so
+    // we can always confirm exactly which type we're dealing with.
+    kind: 'task';
+    createdAt: Date;
+    birthday?: Date;
+}
+
+type Birthday = {
+    kind: 'birthday';
+    name: string;
+    date: Date;
+    id: number;
     createdAt: Date;
 }
 
 function create(content: string): Task {
     let task: Task = {
+        kind: 'task',
         content,
         id: index++,
         status: 'incomplete',
@@ -54,7 +71,7 @@ function complete(id: number) {
     // sure what the correct value for 'task.id' is so will throw an error to make
     // sure we are certain the value is correct and not 'undefined'! Hence checking
     // below that task is true before changing task.status
-    if (task) task.status = 'complete';
+    if (task && task.kind === 'task') task.status = 'complete';
 }
 
 function remove(id: number) {
@@ -65,4 +82,28 @@ function remove(id: number) {
     // -1 IS STILL A NUMBER SO TS DOESN'T PICKUP ON THE FACT IT'S NOT WHAT
     // WE WANT! 
     if (index !== -1) tasks.splice(index, 1);
+}
+
+function createBirthday(name: string, date: string): Birthday {
+    let task: Birthday = {
+        kind: 'birthday',
+        name,
+        date: new Date(date),
+        id: index++,
+        createdAt: new Date(),
+    };
+    tasks.push(task);
+    return task;
+}
+
+function list() {
+    for (let task of tasks) {
+        if (task.kind === 'birthday') {
+            let birthday = task.date.toLocaleDateString('en-GB');
+            console.log('[★]' + task.name + ' ' + birthday);
+        } else {
+            let check = task.status === 'complete' ? '[✔︎]' : '[ ]';
+            console.log(check + task.content);
+        }
+    }
 }
